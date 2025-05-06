@@ -57,3 +57,134 @@ export const detail = async (req: Request, res: Response) => {
 
   res.json(task);
 }
+
+export const changeStatus = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const status = req.body.status;
+    
+
+    await Task.updateOne({ _id: id }, { status: status });
+
+    res.json({
+      code: 200,
+      message: 'Status updated successfully'
+    });
+  } catch {
+    res.json({
+      code: 400,
+      message: 'Error updating status'
+    });
+  }
+}
+
+export const changeMulti = async (req: Request, res: Response) => {
+  try {
+    const { ids, key, value } = req.body;
+
+    enum changeKey {
+      STATUS = 'status',
+      DELETE = 'delete'
+    }
+
+    switch (key) {
+      case changeKey.STATUS:
+        await Task.updateMany({
+          _id: { $in: ids },
+        }, {
+          status: value
+        });
+
+        res.json({
+          code: 200,
+          message: 'Status updated successfully'
+        });
+        break;
+
+      case changeKey.DELETE:
+        await Task.updateMany({
+          _id: { $in: ids },
+        }, {
+          deleted: true,
+          deletedAt: Date.now()
+        });
+
+        res.json({
+          code: 200,
+          message: 'Delete multi successfully'
+        });
+        break;
+
+      default:
+        res.json({
+          code: 400,
+          message: 'Error updating'
+        });
+        break;
+    }
+    
+
+  } catch {
+    res.json({
+      code: 400,
+      message: 'Error updating status'
+    });
+  }
+}
+
+export const create = async (req: Request, res: Response) => {
+  try {
+    const task = new Task(req.body);
+    const data = await task.save();
+
+    res.json({
+      code: 200,
+      message: 'Created task successfully',
+      data: data
+    });
+  } catch {
+    res.json({
+      code: 400,
+      message: 'Error creating task'
+    });
+  }
+}
+
+export const edit = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    await Task.updateOne({ _id: id }, req.body);
+
+    res.json({
+      code: 200,
+      message: 'Edit task successfully'
+    });
+
+  } catch {
+    res.json({
+      code: 400,
+      message: 'Error editing task'
+    });
+  }
+}
+
+export const deleteTask = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    await Task.updateOne({ _id: id }, {
+      deleted: true,
+      deletedAt: new Date()
+    });
+
+    res.json({
+      code: 200,
+      message: 'Delete task successfully'
+    });
+
+  } catch {
+    res.json({
+      code: 400,
+      message: 'Error deleting task'
+    });
+  }
+}
