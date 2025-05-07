@@ -1,5 +1,11 @@
 import mongoose from 'mongoose';
 
+declare module 'express' {
+  interface Request {
+    user?: any;
+  }
+}
+
 const userSchema = new mongoose.Schema(
   {
     fullName: String,

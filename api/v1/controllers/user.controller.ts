@@ -79,3 +79,19 @@ export const login = async (req: Request, res: Response) => {
     token: token
   })
 }
+
+export const detail = async (req: Request, res: Response) => {
+  try {
+    res.json({
+      code: 200,
+      message: 'Detail user successfully',
+      info: req.user
+    });
+    
+  } catch (err) { 
+    res.json({
+      code: 400,
+      message: err
+    });
+  }
+}
